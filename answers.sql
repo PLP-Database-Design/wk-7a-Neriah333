@@ -6,47 +6,44 @@ CREATE TABLE ProductDetail_1NF (
     Product VARCHAR(255)
 );
 
--- Use INSERT and SELECT with string splitting to populate ProductDetail_1NF
-INSERT INTO ProductDetail_1NF (OrderID, CustomerName, Product)
-SELECT OrderID, CustomerName, TRIM(value) AS Product
-FROM ProductDetail
-CROSS APPLY STRING_SPLIT(Products, ',');
 
--- Verify the result (optional)
-SELECT * FROM ProductDetail_1NF;
+INSERT INTO ProductDetail(OrderID, CustomerName, Products)
+VALUES
+(101, 'John Doe', 'Laptop'),
+(101, 'John Doe', 'Mouse'),
+(102, 'Jane Smith', 'Tablet'),
+(102, 'Jane Smith', 'Keyboard'),
+(102, 'Jane Smith', 'Mouse'),
+(103, 'Emily Clark', 'Phone');
 
--- Drop the original table (optional, if you want to replace it)
--- DROP TABLE ProductDetail;
 
 
 -- Question 2
 -- Create a new table Customers to store customer information (OrderID, CustomerName)
-CREATE TABLE Customers (
+-- Question 2
+CREATE TABLE Orders (
     OrderID INT PRIMARY KEY,
-    CustomerName VARCHAR(255)
+    CustomerName VARCHAR(100)
 );
+INSERT INTO Orders (OrderID, CustomerName)
+VALUES
+(101, 'John Doe'),
+(102, 'Jane Smith'),
+(103, 'Emily Clark');
 
--- Populate the Customers table with distinct OrderID and CustomerName pairs
-INSERT INTO Customers (OrderID, CustomerName)
-SELECT DISTINCT OrderID, CustomerName
-FROM OrderDetails;
-
--- Create a new table OrderProducts to store the relationship between orders and products (OrderID, Product, Quantity)
-CREATE TABLE OrderProducts (
+CREATE TABLE Product (
     OrderID INT,
-    Product VARCHAR(255),
+    Product VARCHAR(100),
     Quantity INT,
     PRIMARY KEY (OrderID, Product),
-    FOREIGN KEY (OrderID) REFERENCES Customers(OrderID)
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID)
 );
-
--- Populate the OrderProducts table with OrderID, Product, and Quantity information
-INSERT INTO OrderProducts (OrderID, Product, Quantity)
-SELECT OrderID, Product, Quantity
-FROM OrderDetails;
-
--- Verify the results (optional)
-SELECT * FROM Customers;
-SELECT * FROM OrderProducts;
-
+INSERT INTO Product (OrderID, Product, Quantity)
+VALUES
+(101, 'Laptop', 2),
+(101, 'Mouse', 1),
+(102, 'Tablet', 3),
+(102, 'Keyboard', 1),
+(102, 'Mouse', 2),
+(103, 'Phone', 1);
 
